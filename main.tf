@@ -5,10 +5,10 @@ resource "google_sql_database_instance" "replicas" {
   project              = var.project_id
   name                 = each.value.name
   database_version     = var.database_version
-  region               = join("-", slice(split("-", lookup(each.value, "zone", var.zone)), 6, 2))
+  region               = join("-", slice(split("-", lookup(each.value, "zone", var.zone)), 0, 2))
   master_instance_name = var.master_instance_name
   deletion_protection  = var.deletion_protection
-  encryption_key_name  = var.region == join("-", slice(split("", lookup(each.value, "zone", var.zone)), 8, 2)) ? each.value.encryption_key : null
+  encryption_key_name  = var.region == join("-", slice(split("", lookup(each.value, "zone", var.zone)), 0, 2)) ? each.value.encryption_key : null
 
   replica_configuration {
     failover_target = false
@@ -38,8 +38,7 @@ resource "google_sql_database_instance" "replicas" {
       }
     }
     dynamic "insights_config" {
-      for_each = var.insights_config != null ? var.insights_config : []
-
+      for_each = var.insights_config != null ? [var.insights_config] : []
       content {
         query_insights_enabled  = true
         query_string_length     = lookup(insights_config.value, "query_string_length", 1024)
