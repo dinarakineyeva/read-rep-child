@@ -3,13 +3,11 @@ locals {
   region_letter = substr(local.region_str[1], 8, 1)
   region_number = substr(local.region_str[1], length(local.region_str[1]) - 1, 1)
 
-  instance_name = var.master_instance_name == null ? lower("gep${local.region_letter}${local.region_number}${lookup(var.user_labels, "tla")}") : var.master_instance_name
-
+  instance_name = var.instance_name == null ? lower("gep${local.region_letter}${local.region_number}${lookup(var.user_labels, "tla")}") : var.instance_name
 
   replicas = {
-    for x in var.read_replica : "${local.instance_name}-replicas-${var.read_replica_name_suffix}-${local.instance_name}" => x
+    for x in var.read_replicas : "${local.instance_name}-replicas-${var.read_replica_name_suffix}-${local.instance_name}" => x
   }
-
 
   default_database_flags = [
     {
